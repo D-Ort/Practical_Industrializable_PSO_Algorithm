@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------------
 # Class representing a particle in the PSO algorithm
 # @author: David Ortega Lozano
-# @date: 2026-02-05
+# @date: 2026-02-25
 # @version: 0.1
 # @description: Each particle has a position, velocity, personal best position, and
 # personal best value.
