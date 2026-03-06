@@ -37,4 +37,10 @@ class Swarm:
     
     def optimize(self, max_iterations):
         for iteration in range(max_iterations):
-            self.global_best_position, self.global_best_value = secuential(self.particles, self.objective_function, self.global_best_position, self.global_best_value)
+            match self.method:
+                case 1:
+                    self.global_best_position, self.global_best_value = secuential(self.particles, self.objective_function, self.global_best_position, self.global_best_value)
+                case 2:
+                    self.global_best_position, self.global_best_value = threading_function(self.particles, self.objective_function, self.global_best_position, self.global_best_value)
+
+        
