@@ -12,7 +12,7 @@
 import math
 import numpy as np
 
-def rastrigin_function(x, A=10):
-    quadratic = np.sum(x**2)
-    cosine = np.sum(A * np.cos(2 * math.pi * x))
-    return  (A * len(x)) + quadratic - cosine
+def rastrigin_function(positions, A=10):
+    quadratic = np.sum([x**2 for x in positions])
+    cosine = np.sum([A * np.cos(2 * math.pi * x) for x in positions])
+    return  (A * len(positions)) + quadratic - cosine

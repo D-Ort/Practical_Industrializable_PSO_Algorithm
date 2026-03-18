@@ -15,7 +15,7 @@ def rosenbrock_function(position, a=1, b=100):
     x = position[0:-1]
     y = position[1:]
 
-    parable = sum(b * (y - x**2)**2 for i in range(len(x)))
-    optimum = np.sum((a - x)**2)
+    parable = np.sum([b * (y[i] - x[i]**2)**2 for i in range(len(x))])
+    optimum = np.sum([(a - xi)**2 for xi in x])
 
     return optimum + parable

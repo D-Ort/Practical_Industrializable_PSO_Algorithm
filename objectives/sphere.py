@@ -12,5 +12,5 @@
 
 import numpy as np
 
-def sphere_function(x):
-    return np.sum(x**2)
+def sphere_function(position):
+    return np.sum([x**2 for x in position])
