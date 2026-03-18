@@ -1,5 +1,29 @@
+#----------------------------------------------------------------------------------
+# Main file for running the PSO algorithm and experiments
+# @author: David Ortega Lozano
+# @date: 2026-03-04
+# @version: 0.2
+# @description: This is the main entry point for running the Particle Swarm 
+# Optimization (PSO) algorithm. It allows the user to select an experiment, choose 
+# an objective function, set the number of particles, dimensions, iterations, and 
+# the optimization method (sequential or threading). It also includes an option to 
+# run a predefined experiment with 200 particles and 200 iterations.
+#----------------------------------------------------------------------------------
+
 from core.particle import Particle
 from core.swarm import Swarm
+from experiments.exp1 import sphere
+
+def ask_what_to_do():
+    while True:
+        print("Select the experiment to run:")
+        print("1. Run the PSO algorithm with user input")
+        print("2. Run the experiment with 200 p and 200 i")
+        choice = input("Enter the number of the experiment: ")
+        if choice in ['1', '2']:
+            return int(choice)
+        else:
+            print("Invalid choice. Please enter 1 or 2.")
 
 def ask_function():
     while True:
@@ -31,20 +55,24 @@ def ask_method():
 
 if __name__ == "__main__":
 
-    # Define the objective function to minimize
-    function_choice = ask_function()
+    if(ask_what_to_do() == 1):
+        # Define the objective function to minimize
+        function_choice = ask_function()
 
-    # Create a swarm of particles
-    num_particles = ask_value("particles")
-    num_dimensions = ask_value("dimensions")
-    swarm = Swarm(num_particles, function_choice, num_dimensions)
+        # Create a swarm of particles
+        num_particles = ask_value("particles")
+        num_dimensions = ask_value("dimensions")
+        swarm = Swarm(num_particles, function_choice, num_dimensions)
 
-    # Optimize the objective function
-    max_iterations = ask_value("iterations")
-    method = ask_method()
+        # Optimize the objective function
+        max_iterations = ask_value("iterations")
+        method = ask_method()
 
-    swarm.optimize(max_iterations, method)
+        swarm.optimize(max_iterations, method)
 
-    # Print the best solution found
-    print("Best Position:", swarm.global_best_position)
-    print("Best Value:", swarm.global_best_value)
+        # Print the best solution found
+        print("Best Position:", swarm.global_best_position)
+        print("Best Value:", swarm.global_best_value)
+    else:
+        dimensions = 2
+        sphere(dimensions)
