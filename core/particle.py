@@ -11,6 +11,9 @@
 
 import numpy as np
 
+MAX = 100
+MIN = -100
+
 class Particle:
     def __init__(self, position, velocity):
         self.position = position
@@ -21,9 +24,20 @@ class Particle:
     def update_velocity(self, global_best_position, inertia_weight=0.5, cognitive_weight=1.0, social_weight=1.0):
         r1 = np.random.random()
         r2 = np.random.random()
-        cognitive_component = cognitive_weight * r1 * (self.best_position - self.position)
-        social_component = social_weight * r2 * (global_best_position - self.position)
-        self.velocity = inertia_weight * self.velocity + cognitive_component + social_component
-    
+        for i in range(len(self.position)):
+            cognitive_component = cognitive_weight * r1 * (self.best_position[i] - self.position[i])
+            social_component = social_weight * r2 * (global_best_position[i] - self.position[i])
+            self.velocity[i] = inertia_weight * self.velocity[i] + cognitive_component + social_component
+
     def update_position(self):
         self.position += self.velocity
+
+        mask_min = self.position < MIN
+        mask_max = self.position > MAX
+
+        # Rebote de velocidad
+        self.velocity[mask_min] = - (self.position[mask_min] - MIN)
+        self.velocity[mask_max] = - (self.position[mask_max] - MAX)
+
+        # Limitar posición
+        self.position = np.clip(self.position, MIN, MAX)
