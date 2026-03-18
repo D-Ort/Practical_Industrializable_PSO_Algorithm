@@ -2,7 +2,7 @@
 # Sphere function (sum of squares) objective function for PSO optimization
 # @author: David Ortega Lozano
 # @date: 2026-02-11
-# @version: 0.1
+# @version: 0.2
 # @description: This code defines the sphere function, which is a common benchmark 
 #objective function used in optimization problems. The sphere function is defined 
 #as the sum of the squares of the input variables. It is a simple convex function 

@@ -2,7 +2,7 @@
 # PSO Threading
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 0.1
+# @version: 0.2
 # @description: This code implements a threaded version of the Particle Swarm 
 # Optimization (PSO) algorithm.
 #----------------------------------------------------------------------------------

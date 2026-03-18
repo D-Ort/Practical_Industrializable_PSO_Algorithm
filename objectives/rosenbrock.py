@@ -2,7 +2,7 @@
 # Rosenbrock function (Rosenbrock's valley) objective function for PSO optimization
 # @author: David Ortega Lozano
 # @date: 2026-02-05
-# @version: 0.1
+# @version: 0.2
 # @description: The Rosenbrock function is a non-convex function used as a 
 #performance test problem for optimization algorithms. It is defined as:
 # f(ni) = sum((a - xi)^2 + b(xi+1 - xi^2)^2)

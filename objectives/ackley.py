@@ -2,7 +2,7 @@
 # Ackley function objective function for PSO optimization
 # @author: David Ortega Lozano
 # @date: 2026-02-24
-# @version: 0.1
+# @version: 0.2
 # @description: The Ackley function is a non-convex function used as a 
 #performance test problem for optimization algorithms. It is defined as:
 # f(ni) = -20*exp(-0.2*sqrt(1/n*sum(xi^2))) -exp(1/n*sum(cos(2*pi*xi))) +20+e
