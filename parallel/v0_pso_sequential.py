@@ -21,13 +21,13 @@ def secuential(particles, objective_function, global_best_position, global_best_
 
         match objective_function:
             case 1:
-                value = ackley_function(particle.position)
+                value = sphere_function(particle.position)
             case 2:
                 value = rastrigin_function(particle.position)
             case 3:
                 value = rosenbrock_function(particle.position)
             case 4:
-                value = sphere_function(particle.position)
+                value = ackley_function(particle.position)
 
         if value < particle.best_value:
             particle.best_value = value
