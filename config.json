@@ -1,0 +1,14 @@
+{
+    "LOGS_FILE_NAME": "io_utiles/logs.csv",
+    "PLOT_POS_2D_FILE_NAME": "viz/positions_over_iterations_2D.png",
+    "PLOT_POS_3D_FILE_NAME": "viz/positions_over_iterations_3D.png",
+    "PLOT_VALUES_FILE_NAME": "viz/values_over_iterations.png",
+
+    "PARTICLES": 200,
+    "ITERATIONS": 200,
+    "NUM_DECIMALS": 4,
+
+    "MAX": 100,
+    "MIN": -100,
+    "ERROR": 0.05
+}
