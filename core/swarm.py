@@ -2,7 +2,7 @@
 # Class representing the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-02-27
-# @version: 0.4
+# @version: 1.0
 # @description: It initializes a swarm of particles and iteratively updates their 
 # positions and velocities to find the optimal solution to the given objective 
 # function.

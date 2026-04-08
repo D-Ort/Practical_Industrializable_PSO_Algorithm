@@ -2,7 +2,7 @@
 # Rastrigin function objective function for PSO optimization
 # @author: David Ortega Lozano
 # @date: 2026-02-05
-# @version: 0.4
+# @version: 1.0
 # @description: The Rastrigin function is a non-convex function used as a 
 #performance test problem for optimization algorithms. 
 #----------------------------------------------------------------------------------

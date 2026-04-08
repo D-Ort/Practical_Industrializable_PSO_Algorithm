@@ -2,7 +2,7 @@
 # File in charge of visualizing the results of the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-03-18
-# @version: 0.1
+# @version: 1.0
 # @description: This file contains functions to read the results of the PSO 
 # algorithm from a CSV file and create visualizations of the average positions of 
 # the particles and the global best position over iterations. It also includes a 

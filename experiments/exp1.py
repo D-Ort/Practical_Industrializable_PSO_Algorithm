@@ -2,7 +2,7 @@
 # Experiment 1: Comparison of Sequential and Threaded PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-11
-# @version: 0.2
+# @version: 1.0
 # @description: This code runs an experiment to compare the performance of the 
 # sequential and threaded versions of the Particle Swarm Optimization (PSO) 
 # algorithm. It uses the sphere function as the objective function to minimize and 

@@ -2,7 +2,7 @@
 # PSO Sequential
 # @author: David Ortega Lozano
 # @date: 2026-02-25
-# @version: 0.3
+# @version: 1.0
 # @description: This code implements a sequential version of the Particle Swarm 
 # Optimization (PSO) algorithm.
 #----------------------------------------------------------------------------------
