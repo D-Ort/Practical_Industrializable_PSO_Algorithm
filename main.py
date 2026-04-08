@@ -2,7 +2,7 @@
 # Main file for running the PSO algorithm and experiments
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 0.2
+# @version: 0.3
 # @description: This is the main entry point for running the Particle Swarm 
 # Optimization (PSO) algorithm. It allows the user to select an experiment, choose 
 # an objective function, set the number of particles, dimensions, iterations, and 
@@ -10,11 +10,14 @@
 # run a predefined experiment with 200 particles and 200 iterations.
 #----------------------------------------------------------------------------------
 
-from core.particle import Particle
-from core.swarm import Swarm
-from experiments.exp1 import sphere
+from experiments.exp0 import manual_run
+from experiments.exp1 import compare
+from io_utiles.methods import clean_logs
+from viz.charts import plot
 
-def ask_what_to_do():
+# The ask_what_to_do function prompts the user to select an experiment to run and 
+# returns the choice.
+def ask_what_to_do() -> int:
     while True:
         print("Select the experiment to run:")
         print("1. Run the PSO algorithm with user input")
@@ -25,7 +28,29 @@ def ask_what_to_do():
         else:
             print("Invalid choice. Please enter 1 or 2.")
 
-def ask_function():
+# The ask_dimensions function prompts the user to select the number of dimensions 
+# for the optimization problem and returns the choice.
+def ask_dimensions() -> int:
+    while True:
+        print("Select the number of dimensions:")
+        print("1. 2 dimensions")
+        print("2. 3 dimensions")
+        print("3. 10 dimensions")
+        print("4. 30 dimensions")
+        choice = input("Enter the number of dimensions: ")
+        if choice in ['1', '2', '3', '4']:
+            match choice:
+                case '1': dimensions = 2
+                case '2': dimensions = 3
+                case '3': dimensions = 10
+                case '4': dimensions = 30
+            return int(dimensions)
+        else:
+            print("Invalid choice. Please enter a number between 1 and 4.")
+
+# The ask_function function prompts the user to select an objective function to
+# minimize and returns the choice.
+def ask_function() -> int:
     while True:
         print("Select the objective function to minimize:")
         print("1. Sphere Function")
@@ -38,41 +63,24 @@ def ask_function():
         else:
             print("Invalid choice. Please enter a number between 1 and 4.")
 
-def ask_value(label):
-    choice = input(f"Enter the number of {label}: ")
-    return int(choice)
-
-def ask_method():
-    while True:
-        print("Select the optimization method:")
-        print("1. Sequential")
-        print("2. Threading")
-        choice = input("Enter the number of the method: ")
-        if choice in ['1', '2']:
-            return int(choice)
-        else:
-            print("Invalid choice. Please enter 1 or 2.")
-
+# The main block of the code first cleans the environment by removing the logs file
+# if it exists. Then it prompts the user to select an experiment to run and 
+# executes the corresponding function. Finally, it generates the plots for the 
+# results.
 if __name__ == "__main__":
 
+    # Before starting, the environment is cleaned by removing the logs file if it 
+    # exists
+    clean_logs()
+        
+    # The user is prompted to select an experiment to run and the corresponding 
+    # function
     if(ask_what_to_do() == 1):
-        # Define the objective function to minimize
-        function_choice = ask_function()
-
-        # Create a swarm of particles
-        num_particles = ask_value("particles")
-        num_dimensions = ask_value("dimensions")
-        swarm = Swarm(num_particles, function_choice, num_dimensions)
-
-        # Optimize the objective function
-        max_iterations = ask_value("iterations")
-        method = ask_method()
-
-        swarm.optimize(max_iterations, method)
-
-        # Print the best solution found
-        print("Best Position:", swarm.global_best_position)
-        print("Best Value:", swarm.global_best_value)
+        manual_run(ask_function())
     else:
-        dimensions = 2
-        sphere(dimensions)
+        compare(ask_dimensions(), 
+                ask_function(), 
+                [1, 2])
+
+    # Finally, the plots for the results are generated and saved in the viz folder
+    plot()
