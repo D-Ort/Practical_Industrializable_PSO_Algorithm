@@ -1,44 +1,105 @@
-from core.particle import Particle
-from core.swarm import Swarm
-import time
-from prettytable import PrettyTable
+#----------------------------------------------------------------------------------
+# Experiment 1: Comparison of Sequential and Threaded PSO
+# @author: David Ortega Lozano
+# @date: 2026-03-11
+# @version: 0.2
+# @description: This code runs an experiment to compare the performance of the 
+# sequential and threaded versions of the Particle Swarm Optimization (PSO) 
+# algorithm. It uses the sphere function as the objective function to minimize and 
+# measures the best position, best value, and execution time for both methods. The 
+# results are displayed in a table format for easy comparison.
+#----------------------------------------------------------------------------------
 
-def sphere(dimensions):
+import time
+from core.swarm import Swarm
+from prettytable import PrettyTable
+import numpy as np
+import json
+
+with open('config.json') as config_file:
+    config = json.load(config_file)
+
+# The compare function runs the PSO algorithm using both sequential and threaded
+# methods for a given number of dimensions and objective function choice. It
+# initializes a table to store the results, creates a swarm of particles, optimizes
+# the objective function, and registers the results in the table. Finally, it 
+# prints the table with the results for both methods, showing the best position, 
+# best value,
+def compare(dimensions, 
+            function_choice, 
+            methods = [1, 2]
+            ) -> None:
 
     # Initialize the table of results
-    table = PrettyTable()
-    table.field_names = ["Method", "Best Position", "Best Value", "Execution Time (s)"]
+    table = init_table(dimensions)
 
-    # Define the objective function to minimize
-    function_choice = 1
+    for method in methods:
+        # Create the swarm of particles
+        swarm = Swarm(config["PARTICLES"],
+                      function_choice, 
+                      dimensions)
 
-    # Create a swarm of particles
-    num_particles = 200
-    num_dimensions = dimensions
-    seq_swarm = Swarm(num_particles, function_choice, num_dimensions)
+        # Optimize the objective function
+        start = time.time()
+        swarm.optimize(method)
+        end = time.time()
+        execution_time = end - start
 
-    # Optimize the objective function
-    max_iterations = 200
-    method = 1
-
-    start = time.time() 
-    seq_swarm.optimize(max_iterations, method)
-    end = time.time()
-    seq_time = end - start
-
-    # Include reults in the table
-    table.add_row(["Sequential", seq_swarm.global_best_position, seq_swarm.global_best_value, seq_time])
-
-    thread_swarm = Swarm(num_particles, function_choice, num_dimensions)
-    method = 2
-    start = time.time()
-    thread_swarm.optimize(max_iterations, method)
-    end = time.time()
-    thread_time = end - start
-
-    # Print the best solution found
-    table.add_row(["Threading", thread_swarm.global_best_position, thread_swarm.global_best_value, thread_time])
-
+        # Include results in the table
+        table = register_results(table, 
+                                 method, 
+                                 swarm.global_best_position, 
+                                 swarm.global_best_value, 
+                                 execution_time, 
+                                 dimensions)
+    
     # Print final results
     print(table)
+
+# The init_table function initializes a PrettyTable object with appropriate column
+# names based on the number of dimensions. If the dimensions are greater than 3,
+# it only includes the method, best value, and execution time. Otherwise, it also
+# includes the best position.
+def init_table(dimensions) -> PrettyTable:
+    table = PrettyTable()
+    if dimensions > 3:
+        table.field_names = ["Method",
+                             "Best Value", 
+                             "Execution Time (s)"]
+    else:
+        table.field_names = ["Method", 
+                             "Best Position", 
+                             "Best Value", 
+                             "Execution Time (s)"]
+    return table
+
+# The register_results function takes the results of the optimization process and 
+# adds them to the table. It formats the best position, best value, and execution 
+# time for better readability and determines the method name for display based on 
+# the method used (sequential or threading). Depending on the number of dimensions, 
+# it either includes the best position in the table or omits it for higher 
+# dimensions.
+def register_results(table, 
+                     method, 
+                     best_position, 
+                     best_value, 
+                     execution_time, 
+                     dimensions
+                     ) -> PrettyTable:
     
+    # Determine the method name for display between Sequential, Threading and Multiprocessing
+    method_text = "Sequential" if method == 1 else "Threading" if method == 2 else "Multiprocessing"
+    
+    # Round the best value, best position, and execution time for better readability
+    value = round(best_value, config["NUM_DECIMALS"])
+    position = np.round(best_position, config["NUM_DECIMALS"])
+    ex_time = round(execution_time, config["NUM_DECIMALS"])
+
+    # Add the results to the table, showing only the best position if dimensions are equal or lower than 3
+    if dimensions > 3:
+        table.add_row([method_text, value, ex_time])
+    else:
+        table.add_row([method_text, position.tolist(), value, ex_time]) 
+    
+    # Return the updated table
+    return table
