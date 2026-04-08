@@ -74,7 +74,8 @@ Practical_Industrializable_PSO_Algorithm
 ├── viz
 │   ├── charts.py
 │   ├── positions_over_iterations_2D.png
-│   └── positions_over_iterations_3D.png
+│   ├── positions_over_iterations_3D.png
+│   └── values_over_iterations.png
 │
 ├── config.json
 └── main.py
@@ -260,11 +261,14 @@ Available visualizations:
 |---|---|
 | positions_over_iterations_2D.png | 2D trajectory of swarm mean position |
 | positions_over_iterations_3D.png | 3D trajectory comparison |
+| values_over_iterations.png | 2D values comparison |
 
 The plots compare:
 
 - Average swarm position per iteration
 - Best global position found
+- Average swarm values per ietration
+- Best global value found
 
 The 3D visualization is generated only for 2D optimization problems.
 
