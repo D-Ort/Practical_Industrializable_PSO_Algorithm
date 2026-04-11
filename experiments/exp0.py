@@ -12,7 +12,8 @@
 
 import time
 import json
-from core.swarm import Swarm
+from parallel.v0_pso_sequential import Secuential
+from parallel.v1_pso_threading import Threading
 from experiments.exp1 import init_table, register_results
 
 with open('config.json') as config_file:
@@ -43,18 +44,28 @@ def ask_method() -> int:
 # the execution time.
 def manual_run(function_choice) -> None:
     
-    # Create a swarm of particles
+    # Ask the user for the number of particles and dimensions, and the maximum 
+    # number of iterations.
     num_particles = ask_value("particles")
     num_dimensions = ask_value("dimensions")
-    swarm = Swarm(num_particles, function_choice, num_dimensions)
-
-    # Optimize the objective function
     max_iterations = ask_value("iterations")
-    method = ask_method()
 
+    # Determine the optimization method based on the user's choice and create the
+    # swarm accordingly.
+    method = ask_method()
+    match method:
+        case 1:
+            swarm = Secuential(num_particles, 
+                               function_choice, 
+                               num_dimensions)
+        case 2:
+            swarm = Threading(num_particles, 
+                              function_choice, 
+                              num_dimensions)
+            
+    # Measure the execution time of the optimization process.
     start = time.time()
-    swarm.optimize(max_iterations,
-                   method)
+    swarm.optimize()
     end = time.time()
     execution_time = end - start
 

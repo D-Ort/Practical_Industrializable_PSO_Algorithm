@@ -34,7 +34,7 @@ def save_logs(swarm,
               best_dimensions + 
               ['best_value'] + 
               ['method'])
-    method_label = "Sequential" if method == 1 else "Threading"
+    method_label = method
 
     # The average position in each dimension of all particles for each iteration is
     # calculated and stored in the average list, which is then saved in the file.

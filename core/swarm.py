@@ -2,15 +2,11 @@
 # Class representing the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-02-27
-# @version: 1.0
-# @description: It initializes a swarm of particles and iteratively updates their 
-# positions and velocities to find the optimal solution to the given objective 
-# function.
+# @version: 1.1
+# @description: It initializes a swarm of particles.
 #----------------------------------------------------------------------------------
 
 from core.particle import Particle
-from parallel.v0_pso_sequential import secuential
-from parallel.v1_pso_threading import threading_function
 from objectives.sphere import sphere_function
 from objectives.rosenbrock import rosenbrock_function
 from objectives.rastrigin import rastrigin_function
@@ -22,6 +18,11 @@ import json
 with open('config.json') as f:
     config = json.load(f)
 
+# The Swarm class represents the swarm of particles in the PSO algorithm. It 
+# initializes the particles with random positions and velocities, and it keeps track 
+# of the global best position and value found by the swarm. The optimize method is 
+# meant to be implemented by subclasses to define the specific optimization strategy 
+# (e.g., sequential, threading, multiprocessing).
 class Swarm:
     # The Swarm class takes the number of particles, the number of dimensions, and 
     # the objective function as input parameters.
@@ -48,36 +49,6 @@ class Swarm:
         
         return np.random.uniform(min, max, self.num_dimensions)
     
-    # The optimize method runs the main loop of the PSO algorithm, where it 
-    # evaluates the objective function for each particle, updates their personal 
-    # bests and the global best, and then updates their velocities and positions 
-    # accordingly.
-    def optimize(self,
-                 method = 1
-                 ) -> None:
-        
-        objective_value = 1 if self.objective_function == 3 else 0
-
-        for iteration in range(config["ITERATIONS"]):
-            match method:
-                case 1:
-                    self.global_best_position, self.global_best_value = secuential(self.particles, 
-                                                                                   self.objective_function, 
-                                                                                   self.global_best_position, 
-                                                                                   self.global_best_value)
-                case 2:
-                    self.global_best_position, self.global_best_value = threading_function(self.particles, 
-                                                                                           self.objective_function, 
-                                                                                           self.global_best_position, 
-                                                                                           self.global_best_value)
-            
-            if (self.global_best_value <= (config["ERROR"] + objective_value)
-                and 
-                self.global_best_value >= (-config["ERROR"]) + objective_value):
-                break
-
-        save_logs(self, method)
-
     # The get_first_global_best method initializes the global best position and 
     # value by evaluating the objective function for the initial positions of all 
     # particles and selecting the best one as the initial global best.

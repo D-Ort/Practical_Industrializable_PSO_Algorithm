@@ -2,81 +2,84 @@
 # PSO Threading
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 1.0
+# @version: 1.1
 # @description: This code implements a threaded version of the Particle Swarm 
-# Optimization (PSO) algorithm.
+# Optimization (PSO).
 #----------------------------------------------------------------------------------
 
+from core.swarm import Swarm
+from core.particle import Particle
+from objectives.sphere import sphere_function
+from objectives.rosenbrock import rosenbrock_function
+from objectives.rastrigin import rastrigin_function
+from objectives.ackley import ackley_function
+from io_utiles.methods import save_logs
 import threading
 import json
-from objectives.ackley import ackley_function
-from objectives.rastrigin import rastrigin_function
-from objectives.rosenbrock import rosenbrock_function
-from objectives.sphere import sphere_function
 
-with open('config.json') as config_file:
-    config = json.load(config_file)
+with open('config.json') as f:
+    config = json.load(f)
 
-# The threading_function implements the PSO algorithm using threads, where each
-# particle's velocity and position are updated in parallel, and the objective
-# function is evaluated for each particle to update their personal bests. After
-# all threads have completed, the global best is updated based on the personal 
-# bests of the particles. The thread function is the target function for each 
-# thread,
-def threading_function(particles, 
-                       objective_function, 
-                       global_best_position, 
-                       global_best_value
-                       ) -> tuple:
-    threads = []
+# The Threading class inherits from the Swarm class and implements the optimize method 
+# to run the PSO algorithm in a threaded manner.
+class Threading(Swarm):
 
-    for particle in particles:
-        t = threading.Thread(target = thread, 
-                             args = (particle, 
-                                     objective_function, 
-                                     global_best_position.copy(), 
-                                     global_best_value))
-        threads.append(t)
-        t.start()
+    # The optimize method runs the main loop of the PSO algorithm, where it creates a 
+    # thread for each particle to update their velocity and position, evaluate the 
+    # objective function, and update their personal bests. After all threads have 
+    # completed, it updates the global best based on the personal bests of the 
+    # particles. The loop continues until the stopping criteria are met.
+    def optimize(self) -> None:
+        
+        objective_value = 1 if self.objective_function == 3 else 0
 
-    for t in threads:
-        t.join()
+        for iteration in range(config["ITERATIONS"]):
+            
+            threads = []
 
-    for particle in particles:
-        if particle.best_value < global_best_value:
-            global_best_value = particle.best_value
-            global_best_position = particle.best_position.copy()
+            for particle in self.particles:
+                t = threading.Thread(target = self.thread, args = (particle,))
+                threads.append(t)
+                t.start()
 
-    return global_best_position.copy(), global_best_value
+            for t in threads:
+                t.join()
 
-# The thread function is the target function for each thread, where it updates the
-# velocity and position of the particle, evaluates the objective function, updates
-# the personal best of the particle, and saves the log of the current state. The
-# global best is not updated in this function to avoid race conditions, and it is 
-# updated after all threads have completed in the threading_function.
-def thread(particle, 
-           objective_function, 
-           global_best_position, 
-           global_best_value
-           ) -> None:
-    
-    particle.update_velocity(global_best_position.copy())
-    particle.update_position()
+            for particle in self.particles:
+                if particle.best_value < self.global_best_value:
+                    self.global_best_value = particle.best_value
+                    self.global_best_position = particle.best_position.copy()
+                    
+            if (self.global_best_value <= (config["ERROR"] + objective_value)
+                and 
+                self.global_best_value >= (-config["ERROR"]) + objective_value):
+                break
 
-    match objective_function:
-        case 1:
-            value = sphere_function(particle.position.copy())
-        case 2:
-            value = rastrigin_function(particle.position.copy())
-        case 3:
-            value = rosenbrock_function(particle.position.copy())
-        case 4:
-            value = ackley_function(particle.position.copy())
+        save_logs(self, "Threading")
 
-    if value < particle.best_value:
-        particle.best_value = value
-        particle.best_position = particle.position.copy()
+    # The thread method is the target function for each thread, which updates the 
+    # velocity and position of the particle, evaluates the objective function, and 
+    # updates the personal best of the particle. It also saves the log for the 
+    # particle's current state.
+    def thread(self, particle) -> None:
+        
+        particle.update_velocity(self.global_best_position.copy())
+        particle.update_position()
 
-    particle.save_log(value, 
-                      global_best_position, 
-                      global_best_value)
+        match self.objective_function:
+            case 1:
+                value = sphere_function(particle.position.copy())
+            case 2:
+                value = rastrigin_function(particle.position.copy())
+            case 3:
+                value = rosenbrock_function(particle.position.copy())
+            case 4:
+                value = ackley_function(particle.position.copy())
+
+        if value < particle.best_value:
+            particle.best_value = value
+            particle.best_position = particle.position.copy()
+
+        particle.save_log(value, 
+                           self.global_best_position, 
+                           self.global_best_value)

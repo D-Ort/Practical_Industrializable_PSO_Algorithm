@@ -11,7 +11,8 @@
 #----------------------------------------------------------------------------------
 
 import time
-from core.swarm import Swarm
+from parallel.v0_pso_sequential import Secuential
+from parallel.v1_pso_threading import Threading
 from prettytable import PrettyTable
 import numpy as np
 import json
@@ -35,13 +36,19 @@ def compare(dimensions,
 
     for method in methods:
         # Create the swarm of particles
-        swarm = Swarm(config["PARTICLES"],
-                      function_choice, 
-                      dimensions)
+        match method:
+            case 1:
+                swarm = Secuential(config["PARTICLES"],
+                                   function_choice,
+                                   dimensions)
+            case 2:
+                swarm = Threading(config["PARTICLES"],
+                                  function_choice,
+                                  dimensions)
 
         # Optimize the objective function
         start = time.time()
-        swarm.optimize(method)
+        swarm.optimize()
         end = time.time()
         execution_time = end - start
 
