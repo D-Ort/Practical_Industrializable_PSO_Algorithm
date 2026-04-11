@@ -10,5 +10,7 @@
 
     "MAX": 100,
     "MIN": -100,
-    "ERROR": 0.05
+    "ERROR": 0.05,
+
+    "RANDOM_SEED": 42
 }

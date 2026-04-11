@@ -2,7 +2,7 @@
 # Experiment 1: Comparison of Sequential and Threaded PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-11
-# @version: 1.0
+# @version: 1.1
 # @description: This code runs an experiment to compare the performance of the 
 # sequential and threaded versions of the Particle Swarm Optimization (PSO) 
 # algorithm. It uses the sphere function as the objective function to minimize and 
@@ -31,8 +31,10 @@ def compare(dimensions,
             methods = [1, 2]
             ) -> None:
 
-    # Initialize the table of results
+    # Initialize the table of results and the seeds for reproducibility
     table = init_table(dimensions)
+    particle_seeds = [config["RANDOM_SEED"] + i for i in range(config["PARTICLES"])]
+
 
     for method in methods:
         # Create the swarm of particles
@@ -40,11 +42,13 @@ def compare(dimensions,
             case 1:
                 swarm = Secuential(config["PARTICLES"],
                                    function_choice,
-                                   dimensions)
+                                   particle_seeds,
+                                   dimensions,)
             case 2:
                 swarm = Threading(config["PARTICLES"],
                                   function_choice,
-                                  dimensions)
+                                  particle_seeds,
+                                  dimensions,)
 
         # Optimize the objective function
         start = time.time()

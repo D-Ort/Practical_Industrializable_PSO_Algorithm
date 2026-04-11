@@ -16,14 +16,15 @@ with open('config.json') as f:
     config = json.load(f)
 
 class Particle:
-    def __init__(self, 
-                 position, 
-                 velocity
+    def __init__(self,
+                 num_dimensions,                 
+                 seed
                  ) -> None:
         
-        self.position = position
-        self.velocity = velocity
-        self.best_position = position.copy()
+        self.rng = np.random.default_rng(seed)
+        self.position = self.rng.uniform(config["MIN"], config["MAX"], num_dimensions)
+        self.velocity = self.rng.uniform(-1, 1, num_dimensions)
+        self.best_position = self.position.copy()
         self.best_value = float('inf')
         self.logs = []
     
@@ -37,8 +38,9 @@ class Particle:
                         social_weight=0.5
                         ) -> None:
         
-        r1 = np.random.random()
-        r2 = np.random.random()
+        r1 = self.rng.uniform(0, 1)
+        r2 = self.rng.uniform(0, 1)
+
         for i in range(len(self.position)):
             cognitive_component = cognitive_weight * r1 * (self.best_position[i] - self.position[i])
             social_component = social_weight * r2 * (global_best_position[i] - self.position[i])

@@ -28,16 +28,17 @@ class Swarm:
     # the objective function as input parameters.
     def __init__(self, 
                  num_particles, 
-                 objective_function, 
+                 objective_function,
+                 seeds,
                  num_dimensions = 2
                  ) -> None:
         
         self.num_particles = num_particles
         self.num_dimensions = num_dimensions
         self.objective_function = objective_function
-        self.particles = [Particle(self.random_num(-100, 100), 
-                                   self.random_num(-1, 1)) 
-                                   for _ in range(num_particles)]
+        self.particles = [Particle(num_dimensions,
+                                   seed=seeds[i]) 
+                                   for i in range(num_particles)]
         self.global_best_position, self.global_best_value = self.get_first_global_best()
     
     # The random_num method generate random initial positions and velocities for 

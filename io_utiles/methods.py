@@ -3,7 +3,7 @@
 # environment by removing the logs file if it exists.
 # @author: David Ortega Lozano
 # @date: 2026-03-19
-# @version: 1.0
+# @version: 1.1
 # @description: This module contains methods to save the logs of the particles in a
 # file and to clean the environment by removing the logs file if it exists.
 #----------------------------------------------------------------------------------
