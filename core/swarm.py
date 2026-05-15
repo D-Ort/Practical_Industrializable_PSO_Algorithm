@@ -2,7 +2,7 @@
 # Class representing the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-02-27
-# @version: 1.1
+# @version: 1.3
 # @description: It initializes a swarm of particles.
 #----------------------------------------------------------------------------------
 
@@ -11,7 +11,6 @@ from objectives.sphere import sphere_function
 from objectives.rosenbrock import rosenbrock_function
 from objectives.rastrigin import rastrigin_function
 from objectives.ackley import ackley_function
-from io_utiles.methods import save_logs
 import numpy as np
 import json
 
@@ -30,7 +29,8 @@ class Swarm:
                  num_particles, 
                  objective_function,
                  seeds,
-                 num_dimensions = 2
+                 num_dimensions = config["N_DIMS"][0],
+                 num_iterations = config["ITERATIONS"]
                  ) -> None:
         
         self.num_particles = num_particles
@@ -40,7 +40,8 @@ class Swarm:
                                    seed=seeds[i]) 
                                    for i in range(num_particles)]
         self.global_best_position, self.global_best_value = self.get_first_global_best()
-    
+        self.num_iterations = num_iterations
+
     # The random_num method generate random initial positions and velocities for 
     # the particles within specified ranges.
     def random_num(self, 
@@ -82,3 +83,40 @@ class Swarm:
 
         return bestP, bestV
     
+    # The pso_algorithm method is the target function for each subclass, which 
+    # updates the velocity and position of the particle, evaluates the objective 
+    # function, and updates the personal best of the particle. It also saves the 
+    # log of the particle's current state.
+    def pso_algorithm(self, particle,
+                      global_best_position = None,
+                      global_best_value = None,
+                      objective_function = None) -> Particle:
+        
+        if global_best_position is None:
+            global_best_position = self.global_best_position.copy()
+        if global_best_value is None:
+            global_best_value = self.global_best_value
+        if objective_function is None:
+            objective_function = self.objective_function
+
+        particle.update_velocity(global_best_position)
+        particle.update_position()
+
+        match objective_function:
+            case 1:
+                value = sphere_function(particle.position.copy())
+            case 2:
+                value = rastrigin_function(particle.position.copy())
+            case 3:
+                value = rosenbrock_function(particle.position.copy())
+            case 4:
+                value = ackley_function(particle.position.copy())
+
+        if value < particle.best_value:
+            particle.best_value = value
+            particle.best_position = particle.position.copy()
+
+        particle.save_log(value, 
+                           global_best_position, 
+                           global_best_value)
+        return particle

@@ -2,7 +2,7 @@
 # Main file for running the PSO algorithm and experiments
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 1.0
+# @version: 1.1
 # @description: This is the main entry point for running the Particle Swarm 
 # Optimization (PSO) algorithm. It allows the user to select an experiment, choose 
 # an objective function, set the number of particles, dimensions, iterations, and 
@@ -14,6 +14,10 @@ from experiments.exp0 import manual_run
 from experiments.exp1 import compare
 from io_utiles.methods import clean_logs
 from viz.charts import plot
+import json
+
+with open('config.json') as config_file:
+    config = json.load(config_file)
 
 # The ask_what_to_do function prompts the user to select an experiment to run and 
 # returns the choice.
@@ -33,35 +37,26 @@ def ask_what_to_do() -> int:
 def ask_dimensions() -> int:
     while True:
         print("Select the number of dimensions:")
-        print("1. 2 dimensions")
-        print("2. 3 dimensions")
-        print("3. 10 dimensions")
-        print("4. 30 dimensions")
+        for i, dims in enumerate(config["N_DIMS"], start=1):
+            print(f"{i}. {dims} dimensions")
         choice = input("Enter the number of dimensions: ")
-        if choice in ['1', '2', '3', '4']:
-            match choice:
-                case '1': dimensions = 2
-                case '2': dimensions = 3
-                case '3': dimensions = 10
-                case '4': dimensions = 30
-            return int(dimensions)
+        if int(choice) > 0 and int(choice) <= len(config["N_DIMS"]):
+            return int(config["N_DIMS"][int(choice) - 1])
         else:
-            print("Invalid choice. Please enter a number between 1 and 4.")
+            print("Invalid choice. Please enter a valid dimensions number.")
 
 # The ask_function function prompts the user to select an objective function to
 # minimize and returns the choice.
 def ask_function() -> int:
     while True:
         print("Select the objective function to minimize:")
-        print("1. Sphere Function")
-        print("2. Rastrigin Function")
-        print("3. Rosenbrock Function")
-        print("4. Ackley Function")
+        for i, func in enumerate(config["OBJ_FUNC"], start=1):
+            print(f"{i}. {func}")
         choice = input("Enter the number of the function: ")
-        if choice in ['1', '2', '3', '4']:
+        if int(choice) > 0 and int(choice) <= len(config["OBJ_FUNC"]):
             return int(choice)
         else:
-            print("Invalid choice. Please enter a number between 1 and 4.")
+            print("Invalid choice. Please enter a valid function number.")
 
 # The main block of the code first cleans the environment by removing the logs file
 # if it exists. Then it prompts the user to select an experiment to run and 
@@ -79,8 +74,7 @@ if __name__ == "__main__":
         manual_run(ask_function())
     else:
         compare(ask_dimensions(), 
-                ask_function(), 
-                [1, 2])
+                ask_function())
 
     # Finally, the plots for the results are generated and saved in the viz folder
     plot()

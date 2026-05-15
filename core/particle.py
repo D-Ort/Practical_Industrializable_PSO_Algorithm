@@ -2,7 +2,7 @@
 # Class representing a particle in the PSO algorithm
 # @author: David Ortega Lozano
 # @date: 2026-02-25
-# @version: 1.0
+# @version: 1.1
 # @description: Each particle has a position, velocity, personal best position, and
 # personal best value.
 #  The particle can update its velocity based on the global best position and its
@@ -22,8 +22,12 @@ class Particle:
                  ) -> None:
         
         self.rng = np.random.default_rng(seed)
-        self.position = self.rng.uniform(config["MIN"], config["MAX"], num_dimensions)
-        self.velocity = self.rng.uniform(-1, 1, num_dimensions)
+        self.position = self.rng.uniform(config["MIN"],
+                                         config["MAX"],
+                                         num_dimensions)
+        self.velocity = self.rng.uniform(-1, 
+                                         1, 
+                                         num_dimensions)
         self.best_position = self.position.copy()
         self.best_value = float('inf')
         self.logs = []
@@ -33,13 +37,15 @@ class Particle:
     # cognitive weight, and social weight parameters.
     def update_velocity(self, 
                         global_best_position, 
-                        inertia_weight=0.5, 
-                        cognitive_weight=0.5, 
-                        social_weight=0.5
+                        inertia_weight= config["w"], 
+                        cognitive_weight= config["c1"], 
+                        social_weight= config["c2"]
                         ) -> None:
         
-        r1 = self.rng.uniform(0, 1)
-        r2 = self.rng.uniform(0, 1)
+        r1 = self.rng.uniform(0,
+                              1)
+        r2 = self.rng.uniform(0,
+                              1)
 
         for i in range(len(self.position)):
             cognitive_component = cognitive_weight * r1 * (self.best_position[i] - self.position[i])

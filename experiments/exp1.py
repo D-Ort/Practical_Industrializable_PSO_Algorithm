@@ -1,11 +1,11 @@
 #----------------------------------------------------------------------------------
-# Experiment 1: Comparison of Sequential and Threaded PSO
+# Experiment 1: Comparison of Sequential, Threaded and Multiprocess PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-11
-# @version: 1.1
+# @version: 1.3
 # @description: This code runs an experiment to compare the performance of the 
-# sequential and threaded versions of the Particle Swarm Optimization (PSO) 
-# algorithm. It uses the sphere function as the objective function to minimize and 
+# sequential, threaded and multiprocess versions of the Particle Swarm Optimization (PSO) 
+# algorithm. It uses a objective function as the objective function to minimize and 
 # measures the best position, best value, and execution time for both methods. The 
 # results are displayed in a table format for easy comparison.
 #----------------------------------------------------------------------------------
@@ -13,6 +13,7 @@
 import time
 from parallel.v0_pso_sequential import Secuential
 from parallel.v1_pso_threading import Threading
+from parallel.v2_pso_multiprocessing import Multiprocess
 from prettytable import PrettyTable
 import numpy as np
 import json
@@ -28,12 +29,12 @@ with open('config.json') as config_file:
 # best value,
 def compare(dimensions, 
             function_choice, 
-            methods = [1, 2]
+            methods = list(range(1, len(config["METHODS"]) + 1))
             ) -> None:
 
     # Initialize the table of results and the seeds for reproducibility
     table = init_table(dimensions)
-    particle_seeds = [config["RANDOM_SEED"] + i for i in range(config["PARTICLES"])]
+    p_seeds = [config["RANDOM_SEED"] + i for i in range(config["PARTICLES"])]
 
 
     for method in methods:
@@ -42,13 +43,25 @@ def compare(dimensions,
             case 1:
                 swarm = Secuential(config["PARTICLES"],
                                    function_choice,
-                                   particle_seeds,
-                                   dimensions,)
+                                   p_seeds,
+                                   dimensions)
             case 2:
                 swarm = Threading(config["PARTICLES"],
                                   function_choice,
-                                  particle_seeds,
-                                  dimensions,)
+                                  p_seeds,
+                                  dimensions)
+            case 3:
+                swarm = Multiprocess(config["PARTICLES"],
+                                     function_choice,
+                                     p_seeds,
+                                     dimensions)
+            
+            case _:
+                swarm = Secuential(config["PARTICLES"],
+                                   function_choice,
+                                   p_seeds,
+                                   dimensions)
+                print("Error: Invalid method:", method)
 
         # Optimize the objective function
         start = time.time()
