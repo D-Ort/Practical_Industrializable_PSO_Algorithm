@@ -31,7 +31,10 @@ class Swarm:
                  seeds,
                  num_dimensions = config["N_DIMS"][0],
                  num_iterations = config["ITERATIONS"],
-                 exp_id = 0
+                 exp_id = 0,
+                 w = config["w"],
+                 c1 = config["c1"],
+                 c2 = config["c2"]
                  ) -> None:
         
         self.num_particles = num_particles
@@ -43,6 +46,10 @@ class Swarm:
         self.global_best_position, self.global_best_value = self.get_first_global_best()
         self.num_iterations = num_iterations
         self.exp_id = exp_id
+        self.w = w
+        self.c1 = c1
+        self.c2 = c2
+
     # The random_num method generate random initial positions and velocities for 
     # the particles within specified ranges.
     def random_num(self, 
@@ -100,7 +107,10 @@ class Swarm:
         if objective_function is None:
             objective_function = self.objective_function
 
-        particle.update_velocity(global_best_position)
+        particle.update_velocity(global_best_position,
+                                 inertia_weight=self.w,
+                                 cognitive_weight=self.c1,
+                                 social_weight=self.c2)
         particle.update_position()
 
         match objective_function:

@@ -26,11 +26,12 @@ def ask_what_to_do() -> int:
         print("Select the experiment to run:")
         print("1. Run the PSO algorithm with user input")
         print("2. Run the experiment with 200 p and 200 i")
+        print("3. Run the grid search for PSO hyperparameters")
         choice = input("Enter the number of the experiment: ")
-        if choice in ['1', '2']:
+        if choice in ['1', '2', '3']:
             return int(choice)
         else:
-            print("Invalid choice. Please enter 1 or 2.")
+            print("Invalid choice. Please enter 1, 2, or 3.")
 
 # The ask_dimensions function prompts the user to select the number of dimensions 
 # for the optimization problem and returns the choice.
@@ -70,11 +71,16 @@ if __name__ == "__main__":
         
     # The user is prompted to select an experiment to run and the corresponding 
     # function
-    if(ask_what_to_do() == 1):
+    choice = ask_what_to_do()
+    if choice == 1:
         manual_run(ask_function())
-    else:
+    elif choice == 2:
         compare(ask_dimensions(), 
                 ask_function())
+    elif choice == 3:
+        from experiments import exp2
+        exp2.grid_search(dimensions=ask_dimensions(), 
+                         function_choice=ask_function())
 
     # Finally, the plots for the results are generated and saved in the viz folder
     plot()

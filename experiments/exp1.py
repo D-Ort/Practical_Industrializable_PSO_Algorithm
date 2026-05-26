@@ -116,7 +116,7 @@ def register_results(table,
                      ) -> PrettyTable:
     
     # Determine the method name for display between Sequential, Threading and Multiprocessing
-    method_text = "Sequential" if method == 1 else "Threading" if method == 2 else "Multiprocessing"
+    method_text = "Sequential" if method == 1 else "Threading" if method == 2 else "Multiprocessing" if method == 3 else method
     
     # Round the best value, best position, and execution time for better readability
     value = round(best_value, config["NUM_DECIMALS"])
