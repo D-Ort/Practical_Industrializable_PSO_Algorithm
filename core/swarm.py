@@ -30,7 +30,8 @@ class Swarm:
                  objective_function,
                  seeds,
                  num_dimensions = config["N_DIMS"][0],
-                 num_iterations = config["ITERATIONS"]
+                 num_iterations = config["ITERATIONS"],
+                 exp_id = 0
                  ) -> None:
         
         self.num_particles = num_particles
@@ -41,7 +42,7 @@ class Swarm:
                                    for i in range(num_particles)]
         self.global_best_position, self.global_best_value = self.get_first_global_best()
         self.num_iterations = num_iterations
-
+        self.exp_id = exp_id
     # The random_num method generate random initial positions and velocities for 
     # the particles within specified ranges.
     def random_num(self, 

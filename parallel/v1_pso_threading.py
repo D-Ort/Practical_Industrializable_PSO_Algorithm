@@ -49,4 +49,7 @@ class Threading(Swarm):
                 self.global_best_value >= (-config["ERROR"])):
                 break
 
-        save_logs(self, config["METHODS"][1])
+        save_logs(self,
+                  config["METHODS"][1],
+                  config["OBJ_FUNC"][self.objective_function - 1],
+                  self.exp_id)

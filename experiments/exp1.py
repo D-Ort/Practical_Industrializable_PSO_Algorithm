@@ -36,6 +36,7 @@ def compare(dimensions,
     table = init_table(dimensions)
     p_seeds = [config["RANDOM_SEED"] + i for i in range(config["PARTICLES"])]
 
+    count = 0
 
     for method in methods:
         # Create the swarm of particles
@@ -44,7 +45,8 @@ def compare(dimensions,
                 swarm = Secuential(config["PARTICLES"],
                                    function_choice,
                                    p_seeds,
-                                   dimensions)
+                                   dimensions,
+                                   exp_id=count)
             case 2:
                 swarm = Threading(config["PARTICLES"],
                                   function_choice,
@@ -68,6 +70,8 @@ def compare(dimensions,
         swarm.optimize()
         end = time.time()
         execution_time = end - start
+
+        count += 1
 
         # Include results in the table
         table = register_results(table, 

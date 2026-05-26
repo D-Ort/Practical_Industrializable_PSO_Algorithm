@@ -2,183 +2,294 @@
 # File in charge of visualizing the results of the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-03-18
-# @version: 1.0
-# @description: This file contains functions to read the results of the PSO 
-# algorithm from a CSV file and create visualizations of the average positions of 
-# the particles and the global best position over iterations. It also includes a 
-# function to create a 3D plot of the trajectories of the particles and the global 
-# best position over iterations.
+# @version: 1.2
+# @description: This file contains the main function for visualizing the results of
+# the PSO algorithm, including loading the data from the logs, extracting the 
+# relevant information for each experiment, function, and method, and then calling 
+# the respective plotting functions to create visualizations of the results.
 #----------------------------------------------------------------------------------
 
-import matplotlib
-matplotlib.use('Agg')
 import pandas as pd
-import matplotlib.pyplot as plt
-import json
 import numpy as np
+import json
+from viz.plot_distance import plot_distance
+from viz.plot_position import plot_pos_3d
+from viz.plot_value import plot_value_2D
+from viz.plot_trajectory import plot_trajectory_2D
 
 with open('config.json') as config_file:
     config = json.load(config_file)
+    
 
-# The plot function reads the results of the PSO algorithm from a CSV file, 
-# and extract the average positions, global best positions, average values, and 
-# best values for each method, and then calls the appropriate plotting functions 
-# to create visualizations of the results. It first reads the CSV file into a 
-# DataFrame, determines the number of dimensions based on the column names, and 
-# then iterates through each unique method to extract the relevant data. The 
-# extracted data is stored in dictionaries that are passed to the plotting 
-# functions to create the 2D and 3D plots of the positions and values over 
-# iterations. Finally, it saves the generated plots to files specified in the 
-# configuration.
+# The load_data function reads the PSO results from a CSV file and organizes the 
+# data into a structured format that allows for easy access and manipulation in the
+# subsequent plotting functions. It groups the data by experiment ID, function, 
+# method, particle ID, and iteration, and extracts the relevant information such as
+# positions, values, best positions, and best values for each particle and 
+# iteration.
+def load_data(file_name) -> dict:
+
+    df = pd.read_csv(file_name)
+
+    # Recover arrays from JSON strings
+    df["position"] = df["position"].apply(json.loads)
+    df["best_position"] = df["best_position"].apply(json.loads)
+
+    data = {}
+
+    # Iterate through each experiment and function to extract the relevant data for
+    # plotting. The extracted data is then organized in a structured format that 
+    # allows for easy access and manipulation in the subsequent plotting functions.
+    for exp_id, df_exp in df.groupby("experiment_id"):
+
+        experiment_data = {}
+
+        for function, df_function in df_exp.groupby("function"):
+
+            function_data = {}
+
+            for method, df_method in df_function.groupby("method"):
+
+                method_data = {}
+
+                for particle, df_particle in df_method.groupby("particle_id"):
+
+                    particle_data = {}
+
+                    for iteration, row in df_particle.groupby("iteration"):
+
+                        row = row.iloc[0]
+
+                        particle_data[iteration] = {
+                            "position": row["position"],
+                            "value": row["value"],
+                            "best_position": row["best_position"],
+                            "best_value": row["best_value"]
+                        }
+
+                    method_data[particle] = particle_data
+
+                function_data[method] = method_data
+
+            experiment_data[function] = function_data
+
+        experiment_data["dimensions"] = df_exp["dimensions"].iloc[0]
+
+        data[exp_id] = experiment_data
+
+    return data
+
+# The plot function is the main function that orchestrates the entire process of 
+# loading the data, extracting the relevant information for each experiment, 
+# function, and method, and then calling the respective plotting functions to 
+# create visualizations of the results.
 def plot() -> None:
 
-    df = pd.read_csv(config["LOGS_FILE_NAME"])
+    # Get data organized from load_data function.
+    experiments = load_data(config["LOGS_FILE_NAME"])
 
-    num_columns = len(df.columns)
-    dim = (num_columns - 4) // 2
+    # Iterate through each experiment and function to extract the relevant data for
+    # plotting, including average positions, best positions, average values, and 
+    # best values for each method. The extracted data is then passed to the 
+    # respective plotting functions to create visualizations of the results.
+    for exp_id, exp_data in experiments.items():
+        dimensions = exp_data["dimensions"]
 
-    methods = df["method"].unique()
+        for function, function_data in exp_data.items():
+            if function == "dimensions":
+                continue
 
-    plot_data = {}
-    value_data = {}
+            # Initialize data structures for plotting
+            graph1_data = {
+                "name": [],
+                "avg_distance": [],
+                "best_distance": []
+            }
 
-    for m in methods:
+            graph2_data = {
+                "name": [],
+                "avg_value": [],
+                "best_value": []
+            }
 
-        df_m = df[df["method"] == m].sort_values("iteration")
+            graph3_data = {
+                "name": [],
+                "avg_positions": [],
+                "best_positions": []
+            }
 
-        iterations = df_m["iteration"].values
+            graph4_data = {
+                "name": [],
+                "particle_positions": [],
+                "best_positions": []
+            }
 
-        pos_avg = df_m[[f"pos_{i}" for i in range(dim)]].values
-        best_pos_avg = df_m[[f"best_pos_{i}" for i in range(dim)]].values
+            # Iterate through each method to extract and compute the necessary data
+            # for plotting, including average positions, best positions, average 
+            # values, and best values for each method. The data is organized in a 
+            # way that allows for easy plotting of the results using the respective
+            # plotting functions.
+            for method, method_data in function_data.items():
 
-        plot_data[m] = {
-            "iterations": iterations,
-            "pos_avg": pos_avg,
-            "best_pos_avg": best_pos_avg
-        }
-        value_data[m] = {
-            "iterations": iterations,
-            "value_avg": df_m["value"].values,
-            "best_value": df_m["best_value"].values
-        }
+                avg_distance = []
+                best_distance = []
 
-    plot_pos_2d(plot_data)
-    plot_value_2D(value_data)
+                best_values = []
+                best_positions = []
 
-    if dim == 2:
-        plot_pos_3d(plot_data)
+                particle_positions = []
 
-# The plot_pos_2d function creates a 2D plot of the average positions and global 
-# best positions over iterations for each method. It plots the average position and 
-# global best position for each method, labels the axes, adds a title and legend, 
-# and saves the plot to a file specified in the configuration.
-def plot_pos_2d(plot_data) -> None:
+                positions_by_iteration = None
+                values_by_iteration = None
 
-    plt.figure(figsize=(10,6))
+                for particle_id, particle_data in method_data.items():
 
-    for m, data in plot_data.items():
+                    positions = []
+                    values = []
 
-        iterations = data["iterations"]
+                    # Initialize positions_by_iteration and values_by_iteration on
+                    # the first particle
+                    if positions_by_iteration is None:
 
-        plt.plot(
-            iterations,
-            np.mean(data["pos_avg"], axis=1),
-            label=f"{m} avg pos"
-        )
+                        num_iterations = len(particle_data)
 
-        plt.plot(
-            iterations,
-            np.mean(data["best_pos_avg"], axis=1),
-            linestyle="--",
-            label=f"{m} best pos"
-        )
+                        positions_by_iteration = [
+                            [] for _ in range(num_iterations)
+                        ]
 
-    plt.xlabel("Iteration")
-    plt.ylabel("Position value")
-    plt.title("Average position vs best position")
-    plt.legend()
-    plt.grid()
+                        values_by_iteration = [
+                            [] for _ in range(num_iterations)
+                        ]
 
-    plt.savefig(config["PLOT_POS_2D_FILE_NAME"], dpi=150, bbox_inches="tight")
-    plt.close()
+                    # Iterate through each iteration for the current particle to 
+                    # extract the position and value data, and organize it by 
+                    # iteration for computing averages and distances later on. The
+                    # best positions and best values are also extracted for the 
+                    # first particle to be used in the distance calculations and 
+                    # plotting.
+                    for iteration, iteration_data in particle_data.items():
 
-# The plot_pos_3d function creates a 3D plot of the trajectories of the particles 
-# and the global best position over iterations for each method. It plots the 
-# average position and global best position in 3D space, labels the axes, adds a 
-# title and legend, and saves the plot to a file specified in the configuration. 
-# The x and y axes represent the position values in the two dimensions, while the 
-# z-axis represents the iteration number.
-def plot_pos_3d(plot_data) -> None:
+                        position = np.array(iteration_data["position"])
+                        value = iteration_data["value"]
 
-    fig = plt.figure(figsize=(10,7))
-    ax = fig.add_subplot(111, projection="3d")
+                        positions.append(position)
+                        values.append(value)
 
-    for m, data in plot_data.items():
+                        idx = iteration - 1
 
-        t = data["iterations"]
+                        positions_by_iteration[idx].append(position)
+                        values_by_iteration[idx].append(value)
 
-        pos_x = data["pos_avg"][:,0]
-        pos_y = data["pos_avg"][:,1]
+                        # Only extract best positions and values from the first 
+                        # particle, as they are the same for all particles in the 
+                        # same iteration.
+                        if int(particle_id) == 1:
+                            best_positions.append(
+                                np.array(iteration_data["best_position"])
+                            )
 
-        gb_x = data["best_pos_avg"][:,0]
-        gb_y = data["best_pos_avg"][:,1]
+                            best_values.append(
+                                iteration_data["best_value"]
+                            )
 
-        ax.plot(pos_x, 
-                pos_y, 
-                t, 
-                label=f"{m} avg trajectory")
-        ax.plot(gb_x, 
-                gb_y, 
-                t, 
-                linestyle="--", 
-                label=f"{m} best trajectory")
+                    particle_positions.append(positions)
 
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Iteration")
-    ax.set_title("Trajectory of average position and best position")
+                # Compute average positions and values for each iteration by taking
+                # the mean of the positions and values across all particles for 
+                # each iteration.
+                avg_positions = [
+                    np.mean(pos_list, axis=0)
+                    for pos_list in positions_by_iteration
+                ]
 
-    ax.legend()
-    ax.grid()
+                avg_values = [
+                    np.mean(val_list)
+                    for val_list in values_by_iteration
+                ]
 
-    plt.savefig(config["PLOT_POS_3D_FILE_NAME"], 
-                dpi=150, 
-                bbox_inches="tight")
-    plt.close()
+                # Compute distances from the average positions and best positions 
+                # to the origin (or any reference point) for each iteration, which
+                # can be used to analyze the convergence of the particles towards
+                # the optimal solution over iterations. The distances are 
+                # calculated using the L2 norm (Euclidean distance) for both the 
+                # average positions and the best positions.
+                avg_distance = [
+                    np.linalg.norm(pos)
+                    for pos in avg_positions
+                ]
 
-# The plot_value_2D function creates a 2D plot of the average values and best 
-# values over iterations for each method. It plots the average value and best 
-# value for each method, labels the axes, adds a title and legend, and saves the 
-# plot to a file specified in the configuration. The x-axis represents the 
-# iteration number, while the y-axis represents the value of the objective 
-# function. The average value is plotted with a solid line, while the best value 
-# is plotted with a dashed line to differentiate them visually.
-def plot_value_2D(value_data) -> None:
-    
-    plt.figure(figsize=(10,6))
+                best_distance = [
+                    np.linalg.norm(pos)
+                    for pos in best_positions
+                ]
 
-    for m, data in value_data.items():
+                # Append the extracted and computed data to the respective graph 
+                # data structures for plotting. The data is organized in a way that
+                # allows for easy plotting of the results using the respective 
+                # plotting functions, with the method name, average distances, best
+                # distances, average values, best values, average positions, best 
+                # positions, and particle positions all stored in a structured 
+                # format for each method and function. This allows for clear and 
+                # informative visualizations of the PSO algorithm's performance 
+                # across different methods and functions.
+                graph1_data["name"].append(
+                    f"{method}_{function}_{dimensions}D_{exp_id}"
+                )
 
-        iterations = data["iterations"]
+                graph1_data["avg_distance"].append(avg_distance)
+                graph1_data["best_distance"].append(best_distance)
 
-        plt.plot(
-            iterations,
-            data["value_avg"],
-            label=f"{m} avg value"
-        )
+                graph2_data["name"].append(
+                    f"{method}_{function}_{dimensions}D_{exp_id}"
+                )
 
-        plt.plot(
-            iterations,
-            data["best_value"],
-            linestyle="--",
-            label=f"{m} best value"
-        )
+                graph2_data["avg_value"].append(avg_values)
+                graph2_data["best_value"].append(best_values)
 
-    plt.xlabel("Iteration")
-    plt.ylabel("Value")
-    plt.title("Average value vs best value")
-    plt.legend()
-    plt.grid()
+                if dimensions == 2:
 
-    plt.savefig(config["PLOT_VALUES_FILE_NAME"], dpi=150, bbox_inches="tight")
-    plt.close()
+                    graph3_data["name"].append(
+                        f"{method}_{function}_{dimensions}D_{exp_id}"
+                    )
+
+                    graph3_data["avg_positions"].append(avg_positions)
+                    graph3_data["best_positions"].append(best_positions)
+
+                    graph4_data["name"].append(
+                        f"{method}_{function}_{dimensions}D"
+                    )
+
+                    graph4_data["particle_positions"].append(
+                        particle_positions
+                    )
+
+                    graph4_data["best_positions"].append(
+                        best_positions
+                    )
+
+            # Call the respective plotting functions to create visualizations of 
+            # the results using the extracted and computed data. The plots are 
+            # saved to files with names that include the method, function, 
+            # dimensions, and experiment ID for easy identification and 
+            # organization of the results.
+            plot_distance(
+                graph1_data,
+                f"viz/{exp_id}_{function}_{config['PLOT_DISTANCE_FILE_NAME']}"
+            )
+
+            plot_value_2D(
+                graph2_data,
+                f"viz/{exp_id}_{function}_{config['PLOT_VALUES_FILE_NAME']}"
+            )
+
+            if dimensions == 2:
+
+                plot_pos_3d(
+                    graph3_data,
+                    f"viz/{exp_id}_{function}_{config['PLOT_POSITIONS_FILE_NAME']}"
+                )
+
+                plot_trajectory_2D(
+                    graph4_data,
+                    f"viz/{exp_id}_{function}_{config['PLOT_TRAJECTORY_FILE_NAME']}"
+                )
