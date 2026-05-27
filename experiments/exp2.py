@@ -2,7 +2,7 @@
 # Experiment 2: Grid Search for PSO Hyperparameters
 # @author: David Ortega Lozano
 # @date: 2026-05-12
-# @version: 0.1
+# @version: 0.2
 # @description: This code runs a grid search to find the optimal hyperparameters 
 # for the PSO algorithm.
 #----------------------------------------------------------------------------------
@@ -69,7 +69,8 @@ def grid_search(dimensions,
                     "c2": C2,
                     "best_position": swarm.global_best_position,
                     "best_value": swarm.global_best_value,
-                    "execution_time": execution_time
+                    "execution_time": execution_time,
+                    "id": count
                 })
 
                 # Register results in the table
@@ -109,3 +110,6 @@ def grid_search(dimensions,
 
     with open('config.json', 'w') as config_file:
         json.dump(config, config_file, indent=4)
+
+    # The experiments ids of the top 5 are returned for later analysis.
+    return [result["id"] for result in results[:5]]

@@ -2,7 +2,7 @@
 # Main file for running the PSO algorithm and experiments
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 1.1
+# @version: 1.3
 # @description: This is the main entry point for running the Particle Swarm 
 # Optimization (PSO) algorithm. It allows the user to select an experiment, choose 
 # an objective function, set the number of particles, dimensions, iterations, and 
@@ -12,6 +12,7 @@
 
 from experiments.exp0 import manual_run
 from experiments.exp1 import compare
+from experiments.exp2 import grid_search
 from io_utiles.methods import clean_logs
 from viz.charts import plot
 import json
@@ -27,11 +28,12 @@ def ask_what_to_do() -> int:
         print("1. Run the PSO algorithm with user input")
         print("2. Run the experiment with 200 p and 200 i")
         print("3. Run the grid search for PSO hyperparameters")
+        print("4. Run the industrialized case with 3 d, 30 p and 10 i")
         choice = input("Enter the number of the experiment: ")
-        if choice in ['1', '2', '3']:
+        if choice in ['1', '2', '3', '4']:
             return int(choice)
         else:
-            print("Invalid choice. Please enter 1, 2, or 3.")
+            print("Invalid choice. Please enter 1, 2, 3, or 4.")
 
 # The ask_dimensions function prompts the user to select the number of dimensions 
 # for the optimization problem and returns the choice.
@@ -79,8 +81,10 @@ if __name__ == "__main__":
                 ask_function())
     elif choice == 3:
         from experiments import exp2
-        exp2.grid_search(dimensions=ask_dimensions(), 
+        grid_search(dimensions=ask_dimensions(), 
                          function_choice=ask_function())
+    elif choice == 4:
+        compare(3,5)
 
     # Finally, the plots for the results are generated and saved in the viz folder
     plot()

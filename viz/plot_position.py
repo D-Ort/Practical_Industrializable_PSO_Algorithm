@@ -2,12 +2,13 @@
 # 3D position plot function for PSO results.
 # @author: David Ortega Lozano
 # @date: 2026-04-29
-# @version: 0.1
+# @version: 0.2
 # @description: Function for plotting in 3D the average positions and global best 
 # positions over iterations of PSO results.
 #----------------------------------------------------------------------------------
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import json
 

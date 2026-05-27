@@ -2,21 +2,18 @@
 # Trajectory plot function for PSO results.
 # @author: David Ortega Lozano
 # @date: 2026-05-03
-# @version: 0.1
+# @version: 0.2
 # @description: Function for plotting the convergence of trajectory of PSO results.
 #----------------------------------------------------------------------------------
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, RadioButtons
+import plotly.graph_objects as go
 import numpy as np
 import json
 
 with open('config.json') as config_file:
     config = json.load(config_file)
-
-import plotly.graph_objects as go
-import numpy as np
-
 
 def plot_trajectory_2D(data: dict, file_name: str) -> None:
 

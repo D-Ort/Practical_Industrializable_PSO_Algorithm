@@ -2,7 +2,7 @@
 # Class representing the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-02-27
-# @version: 1.3
+# @version: 1.6
 # @description: It initializes a swarm of particles.
 #----------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ from objectives.sphere import sphere_function
 from objectives.rosenbrock import rosenbrock_function
 from objectives.rastrigin import rastrigin_function
 from objectives.ackley import ackley_function
+from objectives.industrializedCase import logistic_regression_objective
 import numpy as np
 import json
 
@@ -73,6 +74,8 @@ class Swarm:
                 bestV = rastrigin_function(bestP)
             case 4:
                 bestV = ackley_function(bestP)
+            case 5:
+                bestV = logistic_regression_objective(bestP)
 
         for particle in self.particles:
             match self.objective_function:
@@ -84,6 +87,8 @@ class Swarm:
                     value = rastrigin_function(particle.position)
                 case 4:
                     value = ackley_function(particle.position)
+                case 5:
+                    value = logistic_regression_objective(particle.position)
 
             if value < bestV:
                 bestP = particle.position
@@ -122,6 +127,8 @@ class Swarm:
                 value = rosenbrock_function(particle.position.copy())
             case 4:
                 value = ackley_function(particle.position.copy())
+            case 5:
+                value = logistic_regression_objective(particle.position.copy())
 
         if value < particle.best_value:
             particle.best_value = value

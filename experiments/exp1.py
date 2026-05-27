@@ -2,7 +2,7 @@
 # Experiment 1: Comparison of Sequential, Threaded and Multiprocess PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-11
-# @version: 1.3
+# @version: 1.5
 # @description: This code runs an experiment to compare the performance of the 
 # sequential, threaded and multiprocess versions of the Particle Swarm Optimization (PSO) 
 # algorithm. It uses a objective function as the objective function to minimize and 
@@ -36,27 +36,44 @@ def compare(dimensions,
     table = init_table(dimensions)
     p_seeds = [config["RANDOM_SEED"] + i for i in range(config["PARTICLES"])]
 
+    # The number of dimensions, particles and iterations are ensured to be 3, 30 
+    # and 10 for the Industrial case function, as it is a 3-dimensional function
+    # with higher complexity. For other functions, the dimensions are determined 
+    # by the input parameter and the particles and iterations are determined by
+    # the config file. The count variable that is used to assign a unique 
+    # experiment ID, is initialized to 0.
     count = 0
+    if function_choice == 5:
+        dimensions = 3
+        particles = 30
+        iterations = 10
+    else:
+        particles = config["PARTICLES"]
+        iterations = config["ITERATIONS"]
+    
 
     for method in methods:
         # Create the swarm of particles
         match method:
             case 1:
-                swarm = Secuential(config["PARTICLES"],
+                swarm = Secuential(particles,
                                    function_choice,
                                    p_seeds,
                                    dimensions,
-                                   exp_id=count)
+                                   exp_id=count,
+                                   num_iterations=iterations)
             case 2:
                 swarm = Threading(config["PARTICLES"],
                                   function_choice,
                                   p_seeds,
-                                  dimensions)
+                                  dimensions,
+                                  exp_id=count)
             case 3:
                 swarm = Multiprocess(config["PARTICLES"],
                                      function_choice,
                                      p_seeds,
-                                     dimensions)
+                                     dimensions,
+                                     exp_id=count)
             
             case _:
                 swarm = Secuential(config["PARTICLES"],
@@ -70,8 +87,6 @@ def compare(dimensions,
         swarm.optimize()
         end = time.time()
         execution_time = end - start
-
-        count += 1
 
         # Include results in the table
         table = register_results(table, 
@@ -116,7 +131,7 @@ def register_results(table,
                      ) -> PrettyTable:
     
     # Determine the method name for display between Sequential, Threading and Multiprocessing
-    method_text = "Sequential" if method == 1 else "Threading" if method == 2 else "Multiprocessing" if method == 3 else method
+    method_text = config["METHODS"][method - 1] if method in range(1, len(config["METHODS"]) + 1) else method
     
     # Round the best value, best position, and execution time for better readability
     value = round(best_value, config["NUM_DECIMALS"])

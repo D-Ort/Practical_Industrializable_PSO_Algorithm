@@ -14,8 +14,8 @@
     "MAX": 100,
     "MIN": -100,
     "ERROR": 0.05,
-    "w": 0.9,
-    "c1": 0.9,
+    "w": 0.1,
+    "c1": 0.1,
     "c2": 0.5,
     "W_VALUES": [
         0.1,
@@ -42,7 +42,8 @@
         "Sphere",
         "Rastrigin",
         "Rosenbrock",
-        "Ackley"
+        "Ackley",
+        "Logistic Regression"
     ],
     "N_DIMS": [
         2,
