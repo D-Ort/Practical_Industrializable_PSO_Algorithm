@@ -14,7 +14,7 @@
     "MAX": 100,
     "MIN": -100,
     "ERROR": 0.05,
-    "w": 0.1,
+    "w": 0.9,
     "c1": 0.1,
     "c2": 0.5,
     "W_VALUES": [
@@ -44,7 +44,7 @@
         "Rastrigin",
         "Rosenbrock",
         "Ackley",
-        "Logistic Regression"
+        "Logistic_Regression"
     ],
     "N_DIMS": [
         2,

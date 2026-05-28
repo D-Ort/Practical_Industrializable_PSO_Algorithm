@@ -1,24 +1,64 @@
 # PSO Industrializable y evaluación de paralelismo/concurrencia
 
-This repository contains an academic implementation of the Particle Swarm Optimization (PSO) algorithm developed for the course Parallel Programming.
+## Overview
+
+This repository contains an academic implementation of the Particle Swarm Optimization (PSO) algorithm developed for the Parallel Programming course.
 
 The project focuses on two main goals:
 
 - Implementing a clean and extensible PSO architecture
-- Evaluating parallelization strategies to improve performance
+- Evaluating different concurrency and parallelization strategies to improve performance
 
-Currently the project includes:
+Unlike traditional academic PSO implementations focused only on mathematical optimization, this project also explores the practical limitations of Python parallelism, especially regarding:
 
-- A sequential PSO implementation
-- A threading-based parallel implementation
-- Benchmark objective functions
-- Logging and visualization of optimization trajectories
+CPU-bound workloads
+GIL limitations
+Serialization overhead
+Multiprocessing scalability
+Hardware constraints in virtualized environments
 
-Future versions will extend the framework with additional parallel paradigms, benchmarks, and hyperparameter search tools.
+The framework supports both classical benchmark functions and a simple industrializable use case based on hyperparameter optimization of a machine learning model.
 
 ---
 
-# What is Particle Swarm Optimization?
+## Features
+### Implemented PSO Versions
+
+The project currently includes for execution strategies:
+
+| Strategy | Description |
+|---|---|
+| Sequential | Baseline implementation |
+| Threading | Concurrent implementation using Python threads |
+| Multiprocessing | Parallel implementation using process pools |
+| AsyncIO | Cooperative asynchronous implementation |
+
+---
+
+### Objective Functions
+
+| Function | Description |
+|---|---|
+| Sphere | Simple convex benchmark function |
+| Rastrigin | Highly multimodal benchmark |
+| Rosenbrock | Non-convex valley-shaped function |
+| Ackley | Complex multimodal benchmark |
+| Logistic Regression Hyperparameter Optimization | Industrializable machine learning use case |
+
+---
+
+### Visualization System
+
+The project includes a complete visualization pipeline:
+
+- Convergence plots
+- Distance-to-optimum plots
+- 3D swarm trajectory plots
+- Interactive particle trajectory visualization
+
+---
+
+## What is Particle Swarm Optimization?
 
 Particle Swarm Optimization (PSO) is a population-based optimization algorithm inspired by the collective behavior of bird flocks and fish schools.
 
@@ -27,24 +67,116 @@ Each particle in the swarm represents a candidate solution. During the optimizat
 - Their own best known position
 - The best position found by the swarm
 
-The velocity update rule typically follows:
+The standar velocity update ecuation is:
 
-v_i = w · v_i + c1 r1 (pbest_i − x_i) + c2 r2 (gbest − x_i)
+v_i = w · v_i + c1 · r1 · (pbest_i − x_i) + c2 · r2 · (gbest − x_i)
 
 Where:
 
-- **w** → inertia weight  
-- **c1** → cognitive coefficient  
-- **c2** → social coefficient  
-
-In this implementation:
-
-- `w`, `c1`, `c2` default to 0.5
-- They are applied inside `particle.update_velocity()`.
+| Parameter | Meaning |
+|---|---|
+| **w** | Inertia weight |
+| **c1** | Cognitive coefficient |
+| **c2** | Social coefficient |
+| r1, r2 | Random factors |
 
 ---
 
-# Project Structure
+## Parallelization Strategies
+### Sequential Version
+
+The sequential implementation acts as the baseline reference. Particles are evaluated one after another in a single execution thread.
+
+Advantages:
+
+- Minimal overhead
+- Deterministic behavior
+- Best performance for lightweight workloads
+
+---
+
+### Threading Version
+
+The threading implementation creates one thread per particle. This strategy explores Python concurrency using the threading module. However, due to Python's Global Interpreter Lock (GIL), CPU-bound workloads cannot execute Python bytecode truly in parallel.
+
+As a result:
+
+- Significant synchronization overhead appears
+- Real CPU parallelism is not achieved
+- Performance is usually worse than sequential execution
+
+---
+
+### Multiprocessing Version
+
+The multiprocessing implementation uses a process pool to distribute particle evaluations across multiple processes. Unlike threading, multiprocessing bypasses the GIL because each process owns its own Python interpreter. This allows real parallel execution.
+
+However, multiprocessing introduces important costs:
+
+- Object serialization (pickle)
+- Inter-process communication (IPC)
+- Memory duplication
+- Process management overhead
+
+These costs can dominate execution time when particle evaluations are lightweight.
+
+---
+
+### AsyncIO Version
+
+The AsyncIO implementation explores cooperative concurrency using Python's asynchronous event loop. This strategy is primarily educational because PSO is a CPU-bound workload rather than an I/O-bound problem.
+
+AsyncIO demonstrates:
+
+- Cooperative task scheduling
+- Non-blocking execution flow
+- Event loop orchestration
+
+but does not provide true CPU parallelism.
+
+---
+
+## Experimental Conclusions
+
+The experimental results obtained in this project show that:
+
+- Parallelization does not always improve performance.
+- Python threading is heavily limited by the GIL for CPU-bound tasks.
+- Multiprocessing may become slower than sequential execution when task granularity is small.
+- Serialization overhead can dominate execution time.
+- Hardware limitations strongly affect scalability.
+
+In lightweight benchmark functions such as Sphere or Ackley, sequential execution consistently achieves the best performance.
+
+In heavier workloads such as machine learning hyperparameter optimization, multiprocessing becomes more competitive. But overhead may still exceed computational gains depending on hardware constraints.
+
+---
+
+## Industrializable Use Case
+
+The project includes a practical optimization scenario: ***Logistic Regression Hyperparameter Optimization***
+
+PSO is used to optimize hyperparameters of a logistic regression classifier using the Breast Cancer dataset from scikit-learn.
+
+Optimized parameters include:
+
+- Regularization strength (C)
+- Maximum iterations
+- Tolerance
+
+This demonstrates that the PSO framework can be adapted to real-world optimization problems beyond synthetic mathematical benchmarks.
+
+---
+
+## Decisions
+
+The PSO implementation incorporates two stopping criteria to balance optimization quality and computational efficiency. The first criterion is reaching the maximum number of iterations defined in the configuration file, ensuring that the algorithm always terminates after a bounded amount of computation. The second criterion is an early stopping condition based on the objective function value: the optimization process stops automatically when the global best value falls within the interval `[-0.05, 0.05]`. Since the benchmark functions used in this project have their global optimum at or near zero, this tolerance threshold allows the algorithm to terminate once a sufficiently accurate solution has been found, significantly reducing unnecessary computations.
+
+Regarding the search space boundaries, all particles are constrained within the interval `[-100, 100]` for each dimension. To handle boundary violations, a rebound (bounce) policy is applied. When a particle exceeds the allowed search limits, its velocity component is inverted and its position is corrected back into the valid range. This strategy prevents particles from escaping the search space while preserving part of their momentum, helping maintain swarm diversity and improving exploration stability during the optimization process.
+
+---
+
+## Project Structure
 
 ```
 Practical_Industrializable_PSO_Algorithm
@@ -54,31 +186,37 @@ Practical_Industrializable_PSO_Algorithm
 │   └── swarm.py
 │
 ├── objectives
-│   ├── ackley.py
+│   ├── sphere.py
 │   ├── rastrigin.py
 │   ├── rosenbrock.py
-│   └── sphere.py
+│   ├── ackley.py
+│   └── industrializedCase.py
 │
 ├── parallel
 │   ├── v0_pso_sequential.py
-│   └── v1_pso_threading.py
+│   ├── v1_pso_threading.py
+│   ├── v2_pso_multiprocess.py
+│   └── v3_pso_asyncIO.py
 │
 ├── experiments
 │   ├── exp0.py
-│   └── exp1.py
+│   ├── exp1.py
+│   └── exp2.py
 │
-├── io
-│   ├── logs.csv
+├── io_utiles
+│   ├── logistic_dataset.py
 │   └── methods.py
 │
 ├── viz
 │   ├── charts.py
-│   ├── positions_over_iterations_2D.png
-│   ├── positions_over_iterations_3D.png
-│   └── values_over_iterations.png
+│   ├── plot_distance.py
+│   ├── plot_position.py
+│   ├── plot_trajectory.py
+│   └── plot_value.py
 │
 ├── config.json
-└── main.py
+├── main.py
+└── README.md
 ```
 
 ### Directory description
@@ -89,27 +227,27 @@ Practical_Industrializable_PSO_Algorithm
 | `objectives` | Benchmark objective functions |
 | `parallel` | Different PSO parallelization strategies |
 | `experiments` | Experiment execution scripts |
-| `io` | Logging utilities and experiment output |
+| `io_utiles` | Logging utilities and experiment output |
 | `viz` | Visualization utilities and generated charts |
 
 ---
 
-# Installation
+### Installation
 
-Clone the repository:
+#### Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/D-Ort/Practical_Industrializable_PSO_Algorithm>
 cd Practical_Industrializable_PSO_Algorithm
 ```
 
-Run the program:
+#### Run the program:
 
 ```bash
 python main.py
 ```
 
-Recommended Python version:
+#### Recommended Python version:
 
 ```
 Python 3.12+
@@ -117,24 +255,27 @@ Python 3.12+
 
 ---
 
-# Dependencies
+## Dependencies
 
-The project uses the following Python libraries:
+The project uses the following external dependencies:
 
 - numpy
 - pandas
 - matplotlib
 - prettytable
-- json
-- csv
-- os
-- math
-- time
-- threading
+- scikit-learn
+- scipy
+- ipympl
+- ipywidgets
+- pillow
+- jupyter
+- notebook
+- mplcursors
+- ipykernel
 
 ---
 
-# Running the Algorithm
+## Running the Algorithm
 
 The main entry point is:
 
@@ -146,11 +287,9 @@ When executed, the program displays a menu allowing the user to select the exper
 
 ---
 
-## Experiment 0 – Manual configuration
+### Experiment 0 – Manual configuration
 
-```
-Run the PSO algorithm with user input
-```
+Run the PSO algorithm with user input.
 
 The user selects:
 
@@ -158,181 +297,104 @@ The user selects:
 - Number of particles
 - Number of dimensions
 - Maximum iterations
-- Parallel execution method
+- Parallel strategy
 
 ---
 
-## Experiment 1 – Fixed configuration
+### Experiment 1 – Fixed configuration
 
-```
-Run the experiment with 200 particles and 200 iterations
-```
+Run the experiment with 200 particles and 200 iterations with all available strategies under identical conditions and compare.
 
 The user selects:
 
 - Objective function
 - Number of dimensions
 
-The algorithm automatically executes **both parallel methods** and compares them.
+---
 
-Example output:
+### Experiment 2 – Grid Search
 
-```
-+------------+------------+--------------------+
-|   Method   | Best Value | Execution Time (s) |
-+------------+------------+--------------------+
-| Sequential |   0.0484   |       0.1439       |
-| Threading  |   3.0894   |      22.3146       |
-+------------+------------+--------------------+
-```
+Performs PSO hyperparameter search for:
+
+- Inertia weight(`w`)
+- Cognitive coefficient(`c1`)
+- Social coefficient(`c2`)
+
+The best configuration is automatically stored in `config.json`.
 
 ---
 
-# Objective Functions
+### Experiment 3 – Industrializable Case
 
-The current implementation includes several standard benchmark functions:
-
-| Function | Description |
-|---|---|
-| Sphere | Simple convex function |
-| Rastrigin | Highly multimodal function |
-| Rosenbrock | Non-convex valley-shaped function |
-| Ackley | Complex multimodal function |
-
-These functions are widely used to evaluate optimization algorithms.
+An adaptation of Experiment 1, which uses the PSO algorithm to optimize the hyperparameters of a logistic regression model trained on the breast cancer dataset.
 
 ---
 
-# Parallelization Strategies
-
-Two implementations are currently available.
-
-| Method | Description |
-|---|---|
-| Sequential | Standard PSO implementation |
-| Threading | Parallel particle updates using Python threads |
-
-The goal of the project is to evaluate how different parallel paradigms affect the performance of PSO.
-
-Future versions will include additional approaches.
-
----
-
-# Logging
+## Logging
 
 During execution, the algorithm stores iteration statistics in:
 
 ```
-io/logs.csv
+io_utiles/logs.csv
 ```
 
-Each row contains aggregated information for one iteration:
+Each row stores the results for each particle at each iteration:
 
 ```
+experiment_id,
 iteration,
-pos_0,pos_1,...,
+particle_id,
+position,
 value,
-best_pos_0,best_pos_1,...,
+best_position,
 best_value,
-method
+method,
+dimensions,
+function
 ```
 
-These logs are used to generate convergence visualizations.
-
-The file is overwritten on each execution.
+These logs are used to generate visualizations. The file is overwritten on each execution.
 
 ---
 
-# Visualization
+## Visualization Examples
 
-At the end of execution, the program automatically generates plots.
+The framework can generate:
 
-### Position trajectory plots
+- Distance convergence charts
+- Value convergence charts
+- 3D optimization trajectories
+- Interactive swarm evolution plots
 
-Saved in:
+Interactive visualizations allow:
 
-```
-viz/
-```
+- Iteration navigation
+- Experiment selection
+- Swarm trajectory inspection
 
-Available visualizations:
+---
 
-| File | Description |
+## Technologies Used
+
+| Technology | Purpose |
 |---|---|
-| positions_over_iterations_2D.png | 2D trajectory of swarm mean position |
-| positions_over_iterations_3D.png | 3D trajectory comparison |
-| values_over_iterations.png | 2D values comparison |
-
-The plots compare:
-
-- Average swarm position per iteration
-- Best global position found
-- Average swarm values per ietration
-- Best global value found
-
-The 3D visualization is generated only for 2D optimization problems.
+| Python | Main programming language |
+| NumPy | Numerical computation |
+| Pandas | CSV processing |
+| Matplotlib | Visualization |
+| Multiprocessing | Parallel execution |
+| Threading | Concurrency experiments |
+| AsyncIO | Asynchronous execution |
+| Scikit-learn | Machine learning experiments |
 
 ---
 
-# Commands Summary
+## Author
 
-| Action | Command |
-|---|---|
-| Clone repository | `git clone <repo>` |
-| Enter project directory | `cd Practical_Industrializable_PSO_Algorithm` |
-| Run PSO | `python main.py` |
+David Ortega Lozano
 
 ---
 
-# Reproducibility
-
-The current version does not enforce deterministic execution.
-
-Future versions will include:
-
-- Random seed configuration
-- Experiment reproducibility support
-
----
-
-# Future Work (Roadmap)
-
-Several improvements are planned for future versions of the project.
-
-## Additional parallel strategies
-
-- Multiprocessing implementation
-- Asynchronous PSO
-- Vectorized PSO using NumPy
-
-## Benchmark suite
-
-A benchmark mode will be added to:
-
-- Evaluate each objective function
-- Compare dimension sets `{2, 3, 10, 30}`
-- Compare all execution methods
-
-Results will be displayed in formatted tables.
-
-## Hyperparameter Grid Search
-
-A grid search system will be implemented to explore:
-
-- `w`
-- `c1`
-- `c2`
-- number of particles
-- number of iterations
-
-Results will be stored in the configuration file for later reuse.
-
-## Real-world optimization problem
-
-Future versions aim to extend the framework to industrial optimization problems.
-
----
-
-# License
+## License
 
 This project was developed for academic purposes as part of the Parallel Programming course.

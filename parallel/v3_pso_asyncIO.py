@@ -10,6 +10,7 @@
 from core.swarm import Swarm
 from io_utiles.methods import save_logs
 import asyncio
+import nest_asyncio
 import json
 
 with open('config.json') as f:
@@ -68,7 +69,18 @@ class AsyncIO(Swarm):
                   self.exp_id)
 
     # The optimize method is the entry point for running the PSO algorithm, which 
-    # calls the optimize_async method to execute the asynchronous tasks.
-    def optimize(self) -> None:
+    # calls the optimize_async method to execute the asynchronous tasks. It checks
+    # if there is an existing event loop and runs the optimization accordingly, to
+    # skip an error with the Jupiter Notebook.
+    def optimize(self):
 
-        asyncio.run(self.optimize_async())
+        try:
+            loop = asyncio.get_running_loop()
+
+            nest_asyncio.apply()
+
+            loop.run_until_complete(self.optimize_async())
+
+        except RuntimeError:
+
+            asyncio.run(self.optimize_async())

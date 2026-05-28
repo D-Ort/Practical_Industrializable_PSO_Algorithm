@@ -64,29 +64,34 @@ def compare(dimensions,
                                    exp_id=count,
                                    num_iterations=iterations)
             case 2:
-                swarm = Threading(config["PARTICLES"],
+                swarm = Threading(particles,
                                   function_choice,
                                   p_seeds,
                                   dimensions,
-                                  exp_id=count)
+                                  exp_id=count,
+                                  num_iterations=iterations)
+
             case 3:
-                swarm = Multiprocess(config["PARTICLES"],
+                swarm = Multiprocess(particles,
                                      function_choice,
                                      p_seeds,
                                      dimensions,
-                                     exp_id=count)
+                                     exp_id=count,
+                                     num_iterations=iterations)
             case 4:
-                swarm = AsyncIO(config["PARTICLES"],
+                swarm = AsyncIO(particles,
                                 function_choice,
                                 p_seeds,
                                 dimensions,
-                                exp_id=count)
+                                exp_id=count,
+                                num_iterations=iterations)
             case _:
-                swarm = Secuential(config["PARTICLES"],
+                swarm = Secuential(particles,
                                    function_choice,
                                    p_seeds,
                                    dimensions,
-                                   exp_id=count)
+                                   exp_id=count,
+                                   num_iterations=iterations)
                 print("Error: Invalid method:", method)
 
         # Optimize the objective function
@@ -96,12 +101,26 @@ def compare(dimensions,
         execution_time = end - start
 
         # Include results in the table
-        table = register_results(table, 
-                                 method, 
-                                 swarm.global_best_position, 
-                                 swarm.global_best_value, 
-                                 execution_time, 
-                                 dimensions)
+        if(function_choice == 5):
+
+            hiperparameters = []
+            hiperparameters.append(np.clip(abs(swarm.global_best_position[0]), 0.0001, 100))
+            hiperparameters.append(np.clip(abs(swarm.global_best_position[1]), 50, 1000))
+            hiperparameters.append(np.clip(abs(swarm.global_best_position[2]), 1e-6, 1e-1))
+            
+            table = register_results(table, 
+                                     method, 
+                                     hiperparameters, 
+                                     swarm.global_best_value, 
+                                     execution_time, 
+                                     dimensions)
+        else:
+            table = register_results(table, 
+                                     method, 
+                                     swarm.global_best_position, 
+                                     swarm.global_best_value, 
+                                     execution_time, 
+                                     dimensions)
     
     # Print final results
     print(table)
