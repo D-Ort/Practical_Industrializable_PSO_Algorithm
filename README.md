@@ -1,4 +1,4 @@
-# PSO Industrializable y evaluación de paralelismo/concurrencia
+# Industrializable PSO and parallelism/concurrency evaluation
 
 ## Overview
 
