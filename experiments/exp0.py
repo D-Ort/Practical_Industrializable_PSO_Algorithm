@@ -15,6 +15,7 @@ import json
 from parallel.v0_pso_sequential import Secuential
 from parallel.v1_pso_threading import Threading
 from parallel.v2_pso_multiprocessing import Multiprocess
+from parallel.v3_pso_asyncIO import AsyncIO
 from experiments.exp1 import init_table, register_results
 
 with open('config.json') as config_file:
@@ -76,6 +77,12 @@ def manual_run(function_choice) -> None:
                                  p_seeds,
                                  num_dimensions,
                                  max_iterations)
+        case 4:
+            swarm = AsyncIO(num_particles, 
+                            function_choice,
+                            p_seeds,
+                            num_dimensions,
+                            max_iterations)
         case _:
                 swarm = Secuential(config["PARTICLES"],
                                    function_choice,

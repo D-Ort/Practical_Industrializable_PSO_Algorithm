@@ -36,7 +36,8 @@
     "METHODS": [
         "Sequential",
         "Threading",
-        "Multiprocessing"
+        "Multiprocessing",
+        "AsyncIO"
     ],
     "OBJ_FUNC": [
         "Sphere",

@@ -14,6 +14,7 @@ import time
 from parallel.v0_pso_sequential import Secuential
 from parallel.v1_pso_threading import Threading
 from parallel.v2_pso_multiprocessing import Multiprocess
+from parallel.v3_pso_asyncIO import AsyncIO
 from prettytable import PrettyTable
 import numpy as np
 import json
@@ -74,12 +75,18 @@ def compare(dimensions,
                                      p_seeds,
                                      dimensions,
                                      exp_id=count)
-            
+            case 4:
+                swarm = AsyncIO(config["PARTICLES"],
+                                function_choice,
+                                p_seeds,
+                                dimensions,
+                                exp_id=count)
             case _:
                 swarm = Secuential(config["PARTICLES"],
                                    function_choice,
                                    p_seeds,
-                                   dimensions)
+                                   dimensions,
+                                   exp_id=count)
                 print("Error: Invalid method:", method)
 
         # Optimize the objective function

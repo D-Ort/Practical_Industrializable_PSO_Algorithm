@@ -26,7 +26,7 @@ class Multiprocess(Swarm):
     # particles. The loop continues until the stopping criteria are met.
     def optimize(self) -> None:
 
-        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        with multiprocessing.Pool(processes=2) as pool:
 
             for iteration in range(self.num_iterations):
 

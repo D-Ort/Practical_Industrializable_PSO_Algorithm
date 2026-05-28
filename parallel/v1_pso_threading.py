@@ -4,7 +4,7 @@
 # @date: 2026-03-04
 # @version: 1.3
 # @description: This code implements a threaded version of the Particle Swarm 
-# Optimization (PSO).
+# Optimization (PSO) algorithm.
 #----------------------------------------------------------------------------------
 
 from core.swarm import Swarm

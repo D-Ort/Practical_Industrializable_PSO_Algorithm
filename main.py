@@ -82,7 +82,7 @@ if __name__ == "__main__":
     elif choice == 3:
         from experiments import exp2
         grid_search(dimensions=ask_dimensions(), 
-                         function_choice=ask_function())
+                    function_choice=ask_function())
     elif choice == 4:
         compare(3,5)
 
