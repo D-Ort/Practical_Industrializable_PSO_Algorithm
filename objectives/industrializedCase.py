@@ -2,7 +2,7 @@
 # Industrialized case objective function for PSO optimization
 # @author: David Ortega Lozano
 # @date: 2026-05-19
-# @version: 0.1
+# @version: 1.0
 # @description: This code defines the industrialized case objective function for 
 # PSO optimization. The objective function is based on the performance of a 
 # logistic regression model on the breast cancer dataset.

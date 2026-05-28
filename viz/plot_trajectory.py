@@ -2,7 +2,7 @@
 # Trajectory plot function for PSO results.
 # @author: David Ortega Lozano
 # @date: 2026-05-03
-# @version: 0.2
+# @version: 1.0
 # @description: Function for plotting the convergence of trajectory of PSO results.
 #----------------------------------------------------------------------------------
 

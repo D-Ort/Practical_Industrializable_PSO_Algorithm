@@ -2,7 +2,7 @@
 # Main file for running the PSO algorithm and experiments
 # @author: David Ortega Lozano
 # @date: 2026-03-04
-# @version: 1.3
+# @version: 2.0
 # @description: This is the main entry point for running the Particle Swarm 
 # Optimization (PSO) algorithm. It allows the user to select an experiment, choose 
 # an objective function, set the number of particles, dimensions, iterations, and 

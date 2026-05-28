@@ -2,7 +2,7 @@
 # 3D position plot function for PSO results.
 # @author: David Ortega Lozano
 # @date: 2026-04-29
-# @version: 0.2
+# @version: 1.0
 # @description: Function for plotting in 3D the average positions and global best 
 # positions over iterations of PSO results.
 #----------------------------------------------------------------------------------

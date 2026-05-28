@@ -2,7 +2,7 @@
 # Distance plot function for PSO results.
 # @author: David Ortega Lozano
 # @date: 2026-04-29
-# @version: 0.1
+# @version: 1.0
 # @description: Function for plotting the convergence of distance of PSO results.
 #----------------------------------------------------------------------------------
 

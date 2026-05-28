@@ -2,7 +2,7 @@
 # Experiment 2: Grid Search for PSO Hyperparameters
 # @author: David Ortega Lozano
 # @date: 2026-05-12
-# @version: 0.2
+# @version: 1.0
 # @description: This code runs a grid search to find the optimal hyperparameters 
 # for the PSO algorithm.
 #----------------------------------------------------------------------------------

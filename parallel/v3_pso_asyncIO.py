@@ -2,7 +2,7 @@
 # PSO AsyncIO
 # @author: David Ortega Lozano
 # @date: 2026-05-22
-# @version: 0.1
+# @version: 1.0
 # @description: This code implements an asynchronous version of the Particle Swarm 
 # Optimization (PSO) algorithm.
 #----------------------------------------------------------------------------------

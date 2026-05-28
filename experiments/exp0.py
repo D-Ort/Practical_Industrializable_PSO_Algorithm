@@ -2,7 +2,7 @@
 # Experiment 0: Manual Run of PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-18
-# @version: 1.2
+# @version: 2.0
 # @description: This code allows for a manual run of the Particle Swarm 
 # Optimization (PSO) algorithm with user-defined parameters. The user can select 
 # the objective function to minimize, the number of particles, dimensions, 

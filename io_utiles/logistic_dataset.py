@@ -2,7 +2,7 @@
 # Logistic Regression Dataset
 # @author: David Ortega Lozano
 # @date: 2026-05-12
-# @version: 0.1
+# @version: 1.0
 # @description: This module loads the breast cancer dataset, splits it into 
 # training and testing sets, and scales the features using standardization. The 
 # resulting datasets are used in the industrialized case experiment defined in 

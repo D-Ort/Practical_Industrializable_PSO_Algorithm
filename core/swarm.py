@@ -2,7 +2,7 @@
 # Class representing the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-02-27
-# @version: 1.6
+# @version: 2.0
 # @description: It initializes a swarm of particles.
 #----------------------------------------------------------------------------------
 

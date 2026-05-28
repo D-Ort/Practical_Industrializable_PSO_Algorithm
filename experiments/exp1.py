@@ -2,7 +2,7 @@
 # Experiment 1: Comparison of Sequential, Threaded and Multiprocess PSO
 # @author: David Ortega Lozano
 # @date: 2026-03-11
-# @version: 1.5
+# @version: 2.0
 # @description: This code runs an experiment to compare the performance of the 
 # sequential, threaded and multiprocess versions of the Particle Swarm Optimization (PSO) 
 # algorithm. It uses a objective function as the objective function to minimize and 

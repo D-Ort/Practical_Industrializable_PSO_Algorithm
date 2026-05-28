@@ -2,7 +2,7 @@
 # File in charge of visualizing the results of the PSO algorithm.
 # @author: David Ortega Lozano
 # @date: 2026-03-18
-# @version: 1.2
+# @version: 2.0
 # @description: This file contains the main function for visualizing the results of
 # the PSO algorithm, including loading the data from the logs, extracting the 
 # relevant information for each experiment, function, and method, and then calling 

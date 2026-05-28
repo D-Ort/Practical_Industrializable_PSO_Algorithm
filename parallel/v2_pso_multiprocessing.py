@@ -2,7 +2,7 @@
 # PSO Multiprocess
 # @author: David Ortega Lozano
 # @date: 2026-04-28
-# @version: 0.2
+# @version: 1.0
 # @description: This code implements a multiprocess version of the Particle Swarm 
 # Optimization (PSO) algorithm.
 #----------------------------------------------------------------------------------
